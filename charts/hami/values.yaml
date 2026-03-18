@@ -512,5 +512,16 @@ devices:
       - iluvatar.ai/MR-V50.vCore
       - iluvatar.ai/MR-V50.vMem
 
+scalingController:
+  enabled: false
+  image:
+    repository: projecthami/hami-scaling-controller
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  logLevel: 3
+  nodeSelector: {}
+  tolerations: []
+
 prometheus:
   enabled: false

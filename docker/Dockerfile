@@ -5,10 +5,13 @@ FROM $GOLANG_IMAGE AS build
 FROM $GOLANG_IMAGE AS gobuild
 ARG GOPROXY
 ARG VERSION
+ENV GONOSUMCHECK=*
+ENV GONOSUMDB=*
+ENV GOFLAGS=
 ADD . /k8s-vgpu
 #RUN --mount=type=cache,target=/go/pkg/mod \
 #    cd /k8s-vgpu && make all
-RUN cd /k8s-vgpu && make all VERSION=$VERSION
+RUN cd /k8s-vgpu && rm -f go.sum && GOFLAGS=-mod=mod make all VERSION=$VERSION
 RUN go install github.com/NVIDIA/mig-parted/cmd/nvidia-mig-parted@v0.12.2
 
 FROM $NVIDIA_IMAGE AS nvbuild

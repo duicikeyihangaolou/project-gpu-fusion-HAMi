@@ -546,6 +546,8 @@ func (plugin *NvidiaDevicePlugin) Allocate(ctx context.Context, reqs *kubeletdev
 				if plugin.schedulerConfig.DisableCoreLimit {
 					response.Envs[util.CoreLimitSwitch] = "disable"
 				}
+				dynamicConfigContainerPath := fmt.Sprintf("%s/vgpu/dynamic-config", hostHookPath)
+				response.Envs["HAMI_DYNAMIC_CONFIG_PATH"] = dynamicConfigContainerPath
 				cacheFileHostDirectory := fmt.Sprintf("%s/vgpu/containers/%s_%s", hostHookPath, current.UID, currentCtr.Name)
 				os.RemoveAll(cacheFileHostDirectory)
 

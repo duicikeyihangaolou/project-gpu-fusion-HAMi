@@ -21,7 +21,7 @@ GO_BUILD_LDFLAGS=\
 all: build
 
 docker:
-	docker build \
+	docker build --platform=linux/amd64 \
 	--build-arg GOLANG_IMAGE=${GOLANG_IMAGE} \
 	--build-arg TARGET_ARCH=${TARGET_ARCH} \
 	--build-arg NVIDIA_IMAGE=${NVIDIA_IMAGE} \
@@ -60,7 +60,7 @@ clean:
 	$(GO) clean -r -x ./cmd/...
 	-rm -rf $(OUTPUT_DIR)
 
-.PHONY: all build docker clean test $(CMDS)
+.PHONY: all build docker clean test $(CMDS) $(DEVICES)
 
 test:
 	mkdir -p ./_output/coverage/

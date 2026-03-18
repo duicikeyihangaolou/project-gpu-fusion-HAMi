@@ -1,0 +1,101 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: vgpuscalings.hami.io
+  labels:
+    app.kubernetes.io/name: hami
+    app.kubernetes.io/component: scaling
+spec:
+  group: hami.io
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - targetPod
+                - targetContainer
+                - gpu
+              properties:
+                targetPod:
+                  type: string
+                  description: Name of the target pod to scale GPU resources
+                targetContainer:
+                  type: string
+                  description: Name of the target container within the pod
+                gpu:
+                  type: object
+                  required:
+                    - memoryLimit
+                    - coreLimit
+                  properties:
+                    memoryLimit:
+                      type: string
+                      description: "New GPU memory limit (e.g. 8192m, 8g)"
+                    coreLimit:
+                      type: integer
+                      format: int32
+                      minimum: 0
+                      maximum: 100
+                      description: "New GPU core percentage limit (0-100)"
+                action:
+                  type: string
+                  enum:
+                    - scale
+                  default: scale
+                  description: "Scaling action type"
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum:
+                    - Pending
+                    - Validating
+                    - Applying
+                    - Completed
+                    - Failed
+                message:
+                  type: string
+                previousMemoryLimit:
+                  type: string
+                previousCoreLimit:
+                  type: integer
+                  format: int32
+                appliedAt:
+                  type: string
+                  format: date-time
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Pod
+          type: string
+          jsonPath: .spec.targetPod
+        - name: Memory
+          type: string
+          jsonPath: .spec.gpu.memoryLimit
+        - name: Core
+          type: integer
+          jsonPath: .spec.gpu.coreLimit
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Message
+          type: string
+          jsonPath: .status.message
+          priority: 1
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+  scope: Namespaced
+  names:
+    plural: vgpuscalings
+    singular: vgpuscaling
+    kind: VGPUScaling
+    shortNames:
+      - vgs

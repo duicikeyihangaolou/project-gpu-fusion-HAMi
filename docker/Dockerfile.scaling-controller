@@ -1,0 +1,9 @@
+ARG GOLANG_IMAGE=golang:1.25.5-bookworm
+FROM $GOLANG_IMAGE AS build
+ARG GOPROXY
+ADD . /k8s-vgpu
+RUN cd /k8s-vgpu && go build -o bin/scaling-controller ./cmd/scaling-controller/
+
+FROM debian:bookworm-slim
+COPY --from=build /k8s-vgpu/bin/scaling-controller /usr/local/bin/scaling-controller
+ENTRYPOINT ["scaling-controller"]
